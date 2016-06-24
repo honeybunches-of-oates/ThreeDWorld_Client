@@ -262,7 +262,7 @@ class Three_D_World_Client(object):
 		else:
 			print "Error: " + msg["msg"]["msg_type"] + "\n"
 			self.press_enter_to_continue()
-			returnif (debug):
+			return
 
 
 		#connect to received port number
@@ -307,16 +307,16 @@ class Three_D_World_Client(object):
 	#send and receive functions
 	def send_json(self, msg, sock):
 		if (self.debug):
-			print ">" * 20
+			print "\n", ">" * 20
 			print "sending message..."
 		sock.send_json(msg)
 		if (self.debug):
 			print "...message sent:\n", msg
-			print ">" * 20, "\n"
+			print ">" * 20
 	
 	def recv_json(self, sock):
 		if (self.debug):
-			print "<" * 20
+			print "\n", "<" * 20
 			print "waiting for message..."
 		msg = sock.recv_json()
 		if (self.debug):
@@ -366,8 +366,7 @@ class Three_D_World_Client(object):
 
 		msg = json.loads(msg)
 
-		if (msg["msg"]["msg_type"] == "AUTO_SELECT_PORT"):if (debug):
-
+		if (msg["msg"]["msg_type"] == "AUTO_SELECT_PORT"):
 			self.port_num = msg["port_num"]
 		else:
 			print "Error: " + msg["msg"]["msg_type"] + "\n"
@@ -394,26 +393,10 @@ class Three_D_World_Client(object):
 
 		if not default_choice == None and default_choice in options:
 			return default_choice
-if (debug):
 
 		option, index = pick(options, title)
 
 		return option
-
-	def port_num_taken(self):
-		print ("Port requested is unavailable!")
-		if (self.manually_pick_port_num):
-			self.port_num = self.manual_port_selection()
-		else:
-			s = socket.socket()		
-			s.bind(('', 0))
-			self.port_num = s.getsockname()[1]
-			s.close()
-
-		msg = json.dumps({"msg" : {"msg_type" : "CREATE_ENVIRONMENT"}, "port_num" : str(self.port_num)})
-		self.send_json(msg, self.sock)
-
-		self.ready_for_recv = True
 
 	def connect_to_port(self, port_num, use_config=True):
 		self.sock.disconnect("tcp://" + self.queue_host_address + ":" + self.queue_port_number)
