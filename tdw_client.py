@@ -5,7 +5,7 @@ import datetime
 from tabulate import tabulate
 from pick import pick
 
-class Three_D_World_Client(object):
+class TDW_Client(object):
 
 	def __init__(self, host_address="18.93.5.202", 
 				 queue_port_num="23402",
@@ -414,48 +414,12 @@ class Three_D_World_Client(object):
 		if (use_config and self.environment_config):
 			if (self.debug):
 				print "sending with config..."
-			self.sock.send_json(json.dumps({"msg" : {"msg_type" : "CLIENT_JOIN_WITH_CONFIG"}, "config" : self.environment_config}))
+			self.sock.send_json({"n" : 4, "msg" : {"msg_type" : "CLIENT_JOIN_WITH_CONFIG", "config" : self.environment_config}})
 			if (self.debug):
 				print "...sent with config\n"
 		else:
 			if (self.debug):
 				print "sending without config..."
-			self.sock.send_json(json.dumps({"msg" : {"msg_type" : "CLIENT_JOIN"}}))
+			self.sock.send_json({"n" : 4, "msg" : {"msg_type" : "CLIENT_JOIN"}})
 			if (self.debug):
 				print "...sent without config\n"
-
-	#######################################################################################################
-
-	
-client = Three_D_World_Client()
-client.load_config({
-    # Procedural generation
-	"environment_scene" : "ProceduralGeneration",
-    "random_seed": 1, # Omit and it will just choose one at random. Chosen seeds are output into the log(under warning or log level).
-    "should_use_standardized_size": False,
-    "standardized_size": [1.0, 1.0, 1.0],
-    "disabled_items": [], #["SQUIRL", "SNAIL", "STEGOSRS"], # A list of item names to not use, e.g. ["lamp", "bed"] would exclude files with the word "lamp" or "bed" in their file path
-    "permitted_items": [], #["bed1", "sofa_blue", "lamp"],
-    "complexity": 7500,
-    "num_ceiling_lights": 4,
-    "minimum_stacking_base_objects": 15,
-    "minimum_objects_to_stack": 100,
-    "room_width": 10.0,
-    "room_height": 20.0,
-    "room_length": 10.0,
-    "wall_width": 1.0,
-    "door_width": 1.5,
-    "door_height": 3.0,
-    "window_size_width": 5.0,
-    "window_size_height": 5.0,
-    "window_placement_height": 5.0,
-    "window_spacing": 10.0,  # Average spacing between windows on walls
-    "wall_trim_height": 0.5,
-    "wall_trim_thickness": 0.01,
-    "min_hallway_width": 5.0,
-    "number_rooms": 1,
-    "max_wall_twists": 3,
-    "max_placement_attempts": 300,   # Maximum number of failed placements before we consider a room fully filled.
-    "grid_size": 0.4,    # Determines how fine tuned a grid the objects are placed on during Proc. Gen. Smaller the number, the
-})
-client.run()
