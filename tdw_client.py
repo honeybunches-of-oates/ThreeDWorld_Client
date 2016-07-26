@@ -338,7 +338,7 @@ class TDW_Client(object):
 			x = raw_input()
 			get_port_num = False
 			try:
-				if (x == "scan"):
+				if (x == "scan" or len(x) == 0):
 					self.manually_pick_port_num = False
 					self.pick_new_port_num()
 					return
@@ -414,12 +414,12 @@ class TDW_Client(object):
 		if (use_config and self.environment_config):
 			if (self.debug):
 				print "sending with config..."
-			self.sock.send_json({"n" : 4, "msg" : {"msg_type" : "CLIENT_JOIN_WITH_CONFIG", "config" : self.environment_config}})
+			self.sock.send_json({"n" : 3, "msg" : {"msg_type" : "CLIENT_JOIN_WITH_CONFIG", "config" : self.environment_config}})
 			if (self.debug):
 				print "...sent with config\n"
 		else:
 			if (self.debug):
 				print "sending without config..."
-			self.sock.send_json({"n" : 4, "msg" : {"msg_type" : "CLIENT_JOIN"}})
+			self.sock.send_json({"n" : 3, "msg" : {"msg_type" : "CLIENT_JOIN"}})
 			if (self.debug):
 				print "...sent without config\n"
