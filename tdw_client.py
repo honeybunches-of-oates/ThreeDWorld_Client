@@ -7,7 +7,7 @@ from pick import pick
 
 class TDW_Client(object):
 
-	def __init__(self, host_addres, 
+	def __init__(self, host_address, 
 				 queue_port_num="23402",
 				 requested_port_num=None, 
 				 environment_config=None, 
