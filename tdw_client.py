@@ -9,14 +9,15 @@ class TDW_Client(object):
 
 	def __init__(self, host_address, 
 				 queue_port_num="23402",
-				 requested_port_num=None, 
+				 requested_port_num=None,
+				 auto_select_port=True, 
 				 environment_config=None, 
 				 debug=True, 
 				 selected_build=None, 
 				 selected_forward=None, 
 				 initial_command="", 
 				 username=None, 
-				 description=None
+				 description=None,
 				 num_frames_per_msg=4,
 				 get_obj_data=False,
 				 send_scene_info=False):
@@ -53,7 +54,7 @@ class TDW_Client(object):
 			print "...connected @", self.queue_host_address, ":", self.queue_port_number, "\n\n"
 
 		self.connected_to_queue = True
-		self.manually_pick_port_num = True
+		self.manually_pick_port_num = not auto_select_port
 		self.ready_for_input = True
 		self.ready_for_recv = False
 
@@ -142,26 +143,6 @@ class TDW_Client(object):
 		build_option = self.pick_option(msg, default_choice=self.selected_build)
 
 	#phase 2
-		has_valid_port_num = False
-		while (not has_valid_port_num):
-			self.send_json(json.dumps({"msg" : {"msg_type" : "CREATE_ENVIRONMENT_2"}, "port_num" : str(self.port_num)}), self.sock)
-			msg = self.recv_json(self.sock)
-
-			msg = json.loads(msg)
-
-			if (msg["msg"]["msg_type"] == "PORT_UNAVAILABLE"):
-				self.pick_new_port_num()
-			elif (msg["msg"]["msg_type"] == "SEND_OPTIONS"):
-				has_valid_port_num = True
-			else:
-				print "Error: " + msg["msg"]["msg_type"] + "\n"
-				self.press_enter_to_continue()
-				return
-
-	
-		forward_option = self.pick_option(msg, default_choice=self.selected_forward)
-
-	#phase 3
 		username, description = self.username, self.description
 
 		#collect username and description if not given in initialization
@@ -177,9 +158,8 @@ class TDW_Client(object):
 		has_valid_port_num = False
 		while (not has_valid_port_num):
 
-			base_msg = {"msg" : {"msg_type" : "CREATE_ENVIRONMENT_3"}, "port_num" : str(self.port_num), 
+			base_msg = {"msg" : {"msg_type" : "CREATE_ENVIRONMENT_2"}, "port_num" : str(self.port_num), 
 																   "selected_build" : build_option,
-																   "selected_forward" : forward_option,
 																   "username" : username,
 																   "description" : description}
 			msg = base_msg.copy()
