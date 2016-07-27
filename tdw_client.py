@@ -7,7 +7,7 @@ from pick import pick
 
 class TDW_Client(object):
 
-	def __init__(self, host_address="18.93.5.202", 
+	def __init__(self, host_addres, 
 				 queue_port_num="23402",
 				 requested_port_num=None, 
 				 environment_config=None, 
@@ -16,7 +16,10 @@ class TDW_Client(object):
 				 selected_forward=None, 
 				 initial_command="", 
 				 username=None, 
-				 description=None):
+				 description=None
+			     num_frames_per_msg=4,
+				 get_obj_data=False,
+				 send_scene_info=False):
 
 		self.queue_host_address = host_address
 		self.queue_port_number = queue_port_num
@@ -28,6 +31,9 @@ class TDW_Client(object):
 		self.initial_command = initial_command
 		self.username = username
 		self.description = description
+		self.num_frames_per_msg = num_frames_per_msg
+		self.get_obj_data = get_obj_data
+		self.send_scene_info = send_scene_info
 		
 		self.ctx = zmq.Context()
 
@@ -338,7 +344,7 @@ class TDW_Client(object):
 			x = raw_input()
 			get_port_num = False
 			try:
-				if (x == "scan"):
+				if (x == "scan" or len(x) == 0):
 					self.manually_pick_port_num = False
 					self.pick_new_port_num()
 					return
@@ -414,12 +420,12 @@ class TDW_Client(object):
 		if (use_config and self.environment_config):
 			if (self.debug):
 				print "sending with config..."
-			self.sock.send_json({"n" : 4, "msg" : {"msg_type" : "CLIENT_JOIN_WITH_CONFIG", "config" : self.environment_config}})
+			self.sock.send_json({"n" : self.num_frames_per_msg, "msg" : {"msg_type" : "CLIENT_JOIN_WITH_CONFIG", "config" : self.environment_config, "sendSceneInfo" : self.send_scene_info, "get_obj_data" : self.get_obj_data}})
 			if (self.debug):
 				print "...sent with config\n"
 		else:
 			if (self.debug):
 				print "sending without config..."
-			self.sock.send_json({"n" : 4, "msg" : {"msg_type" : "CLIENT_JOIN"}})
+			self.sock.send_json({"n" : self.num_frames_per_msg, "msg" : {"msg_type" : "CLIENT_JOIN", "sendSceneInfo" : self.send_scene_info, "get_obj_data" : self.get_obj_data}})
 			if (self.debug):
 				print "...sent without config\n"
