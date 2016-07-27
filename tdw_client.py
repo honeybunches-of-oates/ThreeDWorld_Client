@@ -17,7 +17,7 @@ class TDW_Client(object):
 				 initial_command="", 
 				 username=None, 
 				 description=None
-			     num_frames_per_msg=4,
+				 num_frames_per_msg=4,
 				 get_obj_data=False,
 				 send_scene_info=False):
 
