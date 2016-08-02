@@ -8,7 +8,7 @@ from pick import pick
 ####################################################################
 #					  Made by Richard Oates						   #
 #																   #
-#					Last modified: 7/28/2016					   #
+#					 Last modified: 8/1/2016					   #
 ####################################################################
 
 class TDW_Client(object):
@@ -157,8 +157,21 @@ class TDW_Client(object):
 				self.press_enter_to_continue()
 				return
 
-		#select a build from available builds on server
-		build_option = self.pick_option(msg, default_choice=self.selected_build)
+
+		#reformat options
+		refmt_options = []
+		for option in msg['options']:
+			i = option.rfind('/')
+			if i < 0:
+				i = 0
+			refmt_options += [option[(i+1):]]
+
+		#pick option
+		build_option = self.pick_option({'title' : msg['title'], 'options' : sorted(refmt_options)}, default_choice=self.selected_build)
+
+		for opt in msg['options']:
+			if opt.endswith(build_option):
+				build_option = opt
 
 	#phase 2
 		username, description = self.username, self.description
@@ -240,7 +253,7 @@ class TDW_Client(object):
 			return
 
 		#pick option
-		option = self.pick_option(msg)
+		option = self.pick_option(msg, self.selected_build)
 
 	#phase 2
 		#send selected option
