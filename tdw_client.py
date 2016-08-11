@@ -26,7 +26,8 @@ class TDW_Client(object):
 				 description=None,
 				 num_frames_per_msg=4,
 				 get_obj_data=False,
-				 send_scene_info=False):
+				 send_scene_info=False,
+				 environment_profile=None):
 
 		#initialize attributes
 		self.queue_host_address = host_address
@@ -41,7 +42,8 @@ class TDW_Client(object):
 		self.num_frames_per_msg = num_frames_per_msg
 		self.get_obj_data = get_obj_data
 		self.send_scene_info = send_scene_info
-		self.debug = debug	
+		self.debug = debug
+		self.environment_profile = environment_profile
 	
 		self.ctx = zmq.Context()
 
@@ -113,6 +115,9 @@ class TDW_Client(object):
 	#sets environment config attribute
 	def load_config(self, config_dict):
 		self.environment_config = config_dict
+
+	def load_profile(self, profile_dict):
+		self.environment_profile = profile_dict
 
 	#attempts to reconnect to saved port number, if succeeds returns true else false
 	def reconnect(self):
@@ -197,7 +202,8 @@ class TDW_Client(object):
 			msg = base_msg.copy()
 		
 			#add config
-			msg.update(self.environment_config)
+			if (self.environment_profile):
+				msg.update(self.environment_profile)
 		
 			#request environment
 			msg = json.dumps(msg)
