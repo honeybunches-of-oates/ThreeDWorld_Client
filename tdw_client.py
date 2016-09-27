@@ -1,13 +1,7 @@
-import json, datetime
+import os, json, datetime
 import zmq
 from tabulate import tabulate
 from pick import pick
-
-####################################################################
-#					  Made by Richard Oates						   #
-#																   #
-#					 Last modified: 8/1/2016					   #
-####################################################################
 
 
 class TDW_Client(object):
@@ -48,9 +42,9 @@ class TDW_Client(object):
 
             - initial_command (str, default: '')
                 When left blank or invalid, you will be required to select available commands from a menu. Options:
-                    - `'request_create_environment'`
-                    - `'request_join_environment'`
-                    - `'request_active_environments'`
+                    - 'request_create_environment'
+                    - 'request_join_environment'
+                    - 'request_active_environments'
                 Whichever command you type, the client will start by running this command.
 
             - requested_port_num (int, default: None)
@@ -80,6 +74,8 @@ class TDW_Client(object):
         self.selected_forward = selected_forward
         self.environment_config = environment_config
         self.initial_command = initial_command
+        if username is None:
+            username = os.environ['USER']
         self.username = username
         self.description = description
         self.num_frames_per_msg = num_frames_per_msg
@@ -177,6 +173,28 @@ class TDW_Client(object):
             return True
         except:
             return False
+
+    def killall(self, username):
+        msg = json.dumps({"msg": {"msg_type": "GET_ACTIVE_ENVIRONMENTS"}})
+        self.send_json(msg, self.sock)
+        msg = self.recv_json(self.sock)
+        msg = json.loads(msg)
+
+        if msg["msg"]["msg_type"] == "ACTIVE_PROCESSES":
+            pass
+        else:
+            print "Error: " + msg["msg"]["msg_type"] + "\n"
+            self.press_enter_to_continue()
+            return
+
+        print 'The following processes will be killed:'
+        print
+        killproc = [p for p in msg['processes'] if p['env_owner'] == username]
+        self.print_processes(killproc)
+
+        for proc in killproc:
+            self.connect_to_port(proc['port_num'], use_config=False)
+            self.send_json({'n': 0, 'msg': {'msg_type': 'TERMINATE'}})
 
     ############################################################################
     #                            COMMANDS TO QUEUE                             #
